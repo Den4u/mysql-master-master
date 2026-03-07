@@ -141,7 +141,7 @@ ansible-playbook master.yml --ask-vault-password
 ```
 ansible-playbook master.yml --ask-vault-pass -v --tags "check_replication"
 ```
-<br />
+
 - Ручная проверка:
 ```
 ssh user@master1
