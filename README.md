@@ -65,7 +65,6 @@
 │   │   └── templates
 │   │       └── jail.local.j2
 │   ├── mysql
-│   │   ├── files
 │   │   ├── handlers
 │   │   │   └── main.yml
 │   │   ├── tasks
@@ -92,7 +91,7 @@ cd ansible-mysql-master-master
 
 2. Настройка инвентаря: <br />
 
-Создайте файл инвентаря ./inventory/hosts (или используйте предоставленный пример hosts.example). В этом файле укажите IP-адреса удаленных серверов, данные Ansible (пользователя) и SSH-порты. <br />
+Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). В этом файле укажите IP-адреса удаленных серверов, данные Ansible (пользователя) и SSH-порты. <br />
 
 
 3. Проверка доступности серверов: <br />
@@ -135,7 +134,7 @@ ansible-playbook master.yml --ask-vault-password
 
 ### Проверка репликации: <br />
 
-- Автоматическая проверка статуса: включена проверка "Fail if replication is not running". Если Replica_IO_Running или Replica_SQL_Running не равно 'Yes' после запуска, выполнение прервется, сигнализируя о сбое репликации.  <br />
+- Автоматическая проверка статуса: включена. Если Replica_IO_Running или Replica_SQL_Running не равно 'Yes' после запуска, выполнение прервется, сигнализируя о сбое репликации.  <br />
 
 - Ручная проверка:  <br />
 ```
@@ -146,7 +145,7 @@ ssh user@host1
 systemctl status mysql
 ```
 
-Проверка статуса репликации через сокет:
+Проверка статуса репликации:
 
 ```
 mysql -S /var/run/mysqld/mysqld.sock  <<EOF
