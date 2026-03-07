@@ -1,0 +1,43 @@
+# Секреты и переменные среды
+
+*.env
+!*.env.j2
+*.local
+
+secrets.yml
+!secrets.yml.example
+
+hosts.example
+hosts
+inventory/hosts
+
+all.yml
+!all.yml.example
+
+master1.yml
+master2.yml
+!master1.yml.example
+!master2.yml.example
+
+haproxy
+
+# --- Временные файлы Python/Ansible ---
+__pycache__/
+*.pyc
+*.retry        # Файлы повторного запуска Ansible
+*.log          # Логи, созданные во время выполнения
+*.tmp          # Любые временные файлы
+
+# --- Файлы IDE и ОС ---
+.idea/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+*.sublime-project
+*.sublime-workspace
+
+.vscode/
+*.code-workspace
+
+.history/

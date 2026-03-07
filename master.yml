@@ -1,0 +1,19 @@
+---
+- name: configure MySQL Master-Master
+  hosts: mysql
+  become: True
+  vars_files:
+    - secrets.yml
+
+  pre_tasks:
+    - name: update the apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - dependencies
+    - timezone
+    - mysql
+    - ufw
+    - fail2ban

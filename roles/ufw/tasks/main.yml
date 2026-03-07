@@ -1,0 +1,53 @@
+---
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: yes
+
+- name: Set UFW default policies (deny incoming, allow outgoing)
+  community.general.ufw:
+    state: enabled
+    policy: deny
+
+# - name: Allow SSH port
+#   community.general.ufw:
+#     rule: allow
+#     port: "{{ ansible_ssh_port | default(22) }}"
+#     proto: tcp
+
+# - name: Allow SSH only from trusted IP
+#   community.general.ufw:
+#     rule: allow
+#     port: "{{ ansible_ssh_port | default(22) }}"
+#     proto: tcp
+#     from: "{{ ignoreip_f2b }}"
+
+# 2. Разрешить SSH доступ от репликации
+- name: Allow SSH (22) access FROM the other Master for coordination
+  community.general.ufw:
+    rule: allow
+    port: "{{ ansible_ssh_port | default(22) }}"
+    proto: tcp
+    from: "{{ other_host_ip }}"
+
+# 3. Разрешить SSH доступ от вашего административного IP
+- name: Allow SSH (22) access FROM Admin IP for management
+  community.general.ufw:
+    rule: allow
+    port: "{{ ansible_ssh_port | default(22) }}"
+    proto: tcp
+    from: "{{ admin_ssh_ip }}" 
+
+- name: Allow MySQL Replication Port (3306) ONLY from the other Master
+  community.general.ufw:
+    rule: allow
+    port: 3306
+    proto: tcp
+    from: "{{ other_host_ip }}"
+
+- name: Check Ufw is enabled and started
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+    enabled: yes

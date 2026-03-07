@@ -1,0 +1,9 @@
+# --- Unique host1 variables ---
+
+private_host: private_ip_host
+other_host_ip: other_private_ip_host
+
+
+# --- mysqld.cnf ---
+server_id: 1
+auto_increment_offset: 1

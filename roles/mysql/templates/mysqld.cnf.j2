@@ -1,0 +1,54 @@
+[mysqld]
+
+# Уникальный идентификатор сервера
+server-id = {{ server_id }}
+
+# Журнал ошибок
+log_error = {{ log_error }}
+
+# Адрес 1/2 мастера
+bind-address = {{ private_host }}
+
+# Путь к bin-логам
+log_bin = {{ log_bin }}
+log_bin_index = {{ log_bin_index }} 
+
+# Формат бинарных логов
+binlog_format = ROW
+
+# Исключение конфликтов автоматического инкремента
+auto_increment_increment = 2
+auto_increment_offset = {{ auto_increment_offset }}
+
+# Relay лог для слейва
+relay_log = {{ relay_log }}
+relay_log_index = {{ relay_log_index }}
+
+# master-master (чтобы слейв писал полученные изменения в свои логи)
+log_slave_updates = 1
+
+# Время хранения бин-логов
+expire_logs_days = {{ expire_logs_days }}
+
+# Максимальный размер бин-лога
+max_binlog_size = {{ max_binlog_size }}
+
+
+# GTID - уникальный 128-битный глобальный идентификационный номер (SERVER_UUID)
+gtid_mode = ON
+
+# Совместимость с GTID
+enforce_gtid_consistency = ON
+
+# Хранит инфо о мастере в mysql.slave_master_info
+master_info_repository = TABLE
+
+# Хранит инфо о relay-log
+relay_log_info_repository = TABLE
+
+# Автоматически восстанавливает relay logs при запуске слейва
+relay_log_recovery = ON
+
+
+# Бин логи синхронизируются с диском после каждого транзакции
+sync_binlog = 1

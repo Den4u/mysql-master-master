@@ -1,0 +1,14 @@
+[DEFAULT]
+maxretry  = {{ maxretry_f2b }}
+findtime  = {{ findtime_f2b }}
+bantime   = {{ bantime_f2b }}
+
+ignoreip = {{ ignoreip_f2b }}
+
+banaction = ufw
+
+logpath = {{ logpath_ssh }}
+
+[sshd]
+enabled = true
+port = {{ port_ssh_f2b }}

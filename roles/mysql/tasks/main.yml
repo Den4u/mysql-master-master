@@ -1,0 +1,76 @@
+---
+- name: Mysql install
+  ansible.builtin.apt:
+    name: mysql-server
+    state: present
+
+- name: Check mysql is enabled and started
+  ansible.builtin.systemd:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Removes anonymous user account for localhost
+  community.mysql.mysql_user:
+    name: ''
+    host: localhost
+    state: absent
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create database user 'replica' with replication privileges
+  community.mysql.mysql_user:
+    name: "{{ replica_user }}"
+    host: "{{ other_host_ip }}"
+    password: "{{ mysql_replica_pass }}"
+    priv: '*.*:REPLICATION SLAVE'
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create mysqld.cnf
+  ansible.builtin.template:
+    src: templates/mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    mode: '0644'
+  notify: Restart MySQL
+
+- name: Forced restart MySQL
+  ansible.builtin.meta: flush_handlers
+
+- name: Check if replica is running
+  community.mysql.mysql_replication:
+    mode: getreplica
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: replica_status
+  ignore_errors: yes
+
+- name: Stop slave only if it is running
+  community.mysql.mysql_replication:
+    mode: stopreplica
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  when: replica_status is defined and replica_status.Replica_IO_Running == 'Yes' and replica_status.Replica_SQL_Running == 'Yes'
+  ignore_errors: yes
+
+- name: Configure replication slave with GTID auto position
+  community.mysql.mysql_replication:
+    mode: changeprimary
+    master_host: "{{ other_host_ip }}"
+    master_user: "{{ replica_user }}"
+    master_password: "{{ mysql_replica_pass }}"
+    master_auto_position: true
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Start slave
+  community.mysql.mysql_replication:
+    mode: startreplica
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Check replication status
+  community.mysql.mysql_replication:
+    mode: getreplica
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: replica_status
+
+- name: Fail if replication is not running
+  ansible.builtin.fail:
+    msg: "Replication is not running properly! Replica_IO_Running={{ replica_status.Replica_IO_Running }}, Replica_SQL_Running={{ replica_status.Replica_SQL_Running }}"
+  when: replica_status.Replica_IO_Running != 'Yes' or replica_status.Replica_SQL_Running != 'Yes'
