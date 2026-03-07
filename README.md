@@ -1,5 +1,7 @@
-## Ansible: MySQL (Master-Master Replication)
-<br>
+## Ansible: MySQL (Master-Master Replication)<br>
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
 
 ### Содержание:
 * [Описание](#описание)
