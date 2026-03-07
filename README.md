@@ -91,7 +91,7 @@ cd ansible-mysql-master-master
 
 2. Настройка инвентаря: <br />
 
-Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). В этом файле укажите IP-адреса удаленных серверов, данные Ansible (пользователя) и SSH-порты. <br />
+Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). В этом файле укажите IP-адреса удаленных серверов, данные пользователей, SSH-порты. <br />
 
 
 3. Проверка доступности серверов: <br />
@@ -132,13 +132,19 @@ ansible-vault create secrets.yml
 ansible-playbook master.yml --ask-vault-password
 ```
 
-### Проверка репликации: <br />
+### Проверка репликации:
 
-- Автоматическая проверка статуса: включена. Если Replica_IO_Running или Replica_SQL_Running не равно 'Yes' после запуска, выполнение прервется, сигнализируя о сбое репликации.  <br />
+ <br />
+- Автоматическая проверка статуса: включена. Если Replica_IO_Running или Replica_SQL_Running не равно 'Yes' после запуска, выполнение прервется, сигнализируя о сбое репликации. <br />
 
+Запуск только проверки статуса:
+```
+ansible-playbook master.yml --ask-vault-pass -v --tags "check_replication"
+```
+<br />
 - Ручная проверка:  <br />
 ```
-ssh user@host1
+ssh user@master1
 ```
 Проверка статуса сервиса: <br />
 ```
@@ -152,8 +158,6 @@ mysql -S /var/run/mysqld/mysqld.sock  <<EOF
 SHOW MASTER STATUS;
 SHOW SLAVE STATUS\G
 SELECT @@GLOBAL.gtid_executed;
-create database DB_NAME;
-show databases;
 EOF
 ```
 

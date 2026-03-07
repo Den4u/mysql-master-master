@@ -33,7 +33,7 @@
     mode: '0644'
   notify: Restart MySQL
 
-- name: Forced restart MySQL
+- name: Apply MySQL configuration changes
   ansible.builtin.meta: flush_handlers
 
 - name: Check if replica is running
@@ -48,7 +48,9 @@
     mode: stopreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
   when: replica_status is defined and replica_status.Replica_IO_Running == 'Yes' and replica_status.Replica_SQL_Running == 'Yes'
-  ignore_errors: yes
+  until: replica_status is succeeded
+  retries: 2
+  delay: 3
 
 - name: Configure replication slave with GTID auto position
   community.mysql.mysql_replication:
@@ -64,13 +66,16 @@
     mode: startreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Check replication status
-  community.mysql.mysql_replication:
-    mode: getreplica
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-  register: replica_status
-
-- name: Fail if replication is not running
-  ansible.builtin.fail:
-    msg: "Replication is not running properly! Replica_IO_Running={{ replica_status.Replica_IO_Running }}, Replica_SQL_Running={{ replica_status.Replica_SQL_Running }}"
-  when: replica_status.Replica_IO_Running != 'Yes' or replica_status.Replica_SQL_Running != 'Yes'
+- name: Replication status check block
+  tags: check_replication
+  block:
+    - name: Check replication status
+      community.mysql.mysql_replication:
+        mode: getreplica
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      register: replica_status
+ 
+    - name: Fail if replication is not running
+      ansible.builtin.fail:
+        msg: "Replication is not running properly! Replica_IO_Running={{ replica_status.Replica_IO_Running }}, Replica_SQL_Running={{ replica_status.Replica_SQL_Running }}"
+      when: replica_status.Replica_IO_Running != 'Yes' or replica_status.Replica_SQL_Running != 'Yes'

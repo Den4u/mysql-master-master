@@ -23,11 +23,11 @@ max_binlog_size: 500M
 
 # Fail2ban config - jail.local.j2:
 logpath_ssh: "%(sshd_log)s"
-maxretry_f2b: 2               
+maxretry_f2b: 2    
 findtime_f2b: 5m
 bantime_f2b: 1d
-ignoreip_f2b: ip1 ip2       
-port_ssh_f2b: 22                      
+ignoreip_f2b: ip1 ip2
+port_ssh_f2b: 22
 
 
 #system UTC
@@ -35,4 +35,4 @@ timezone_: "Europe/Moscow"
 
 # ufw
 # --- ip_admin_host ---
-admin_ssh_ip: ip_admin 
+admin_ssh_ip: ip_admin
