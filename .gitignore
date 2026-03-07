@@ -7,7 +7,7 @@
 secrets.yml
 !secrets.yml.example
 
-hosts.example
+!hosts.example
 hosts
 inventory/hosts
 

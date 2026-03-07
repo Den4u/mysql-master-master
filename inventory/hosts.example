@@ -1,0 +1,4 @@
+[mysql]
+host1 ansible_host=<master_ip1> ansible_user=<user1> ansible_ssh_port=22 ansible_ssh_private_key_file=/puth/to/key
+host2 ansible_host=<master_ip2> ansible_user=<user2> ansible_ssh_port=22 ansible_ssh_private_key_file=/puth/to/key
+
