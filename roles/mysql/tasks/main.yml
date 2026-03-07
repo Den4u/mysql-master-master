@@ -48,9 +48,7 @@
     mode: stopreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
   when: replica_status is defined and replica_status.Replica_IO_Running == 'Yes' and replica_status.Replica_SQL_Running == 'Yes'
-  until: replica_status is succeeded
-  retries: 2
-  delay: 3
+  ignore_errors: yes
 
 - name: Configure replication slave with GTID auto position
   community.mysql.mysql_replication:

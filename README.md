@@ -85,8 +85,8 @@
 
 1. Клонирование репозитория:
 ```
-git clone git@github.com:Den4u/ansible-mysql-master-master.git
-cd ansible-mysql-master-master
+git clone git@github.com:Den4u/mysql-master-master.git
+cd mysql-master-master
 ```
 
 2. Настройка инвентаря: <br />
