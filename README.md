@@ -1,4 +1,4 @@
-## Ansible: MySQL (Master-Master Replication)<br>
+## Ansible: HAProxy + MySQL (Master-Master Replication)<br>
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
 ![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
@@ -13,30 +13,31 @@
 
 
 ### Описание:
-Репозиторий содержит готовый сценарий `master.yml` для автоматической настройки двух серверов MySQL в режиме Active-Active Master-Master (M-M) репликации.
+Репозиторий содержит сценарий Ansible для развертывания HAProxy + MySQL (Master-Master). 
 
 Настройка включает:
-  - Установку часового пояса и необходимых зависимостей.
-  - Установку и базовую конфигурацию MySQL.
-  - Настройку репликации с использованием Global Transaction Identifiers (GTID).
-  - Применение базовых мер безопасности: настройка брандмауэра UFW (с открытием портов только для доверенных узлов) и установка Fail2Ban.
+  - Базовую подготовку системы (часовой пояс, необходимые зависимости).
+  - Установку и конфигурацию MySQL с Master-Master репликацией через GTID.
+  - Настройку HAProxy для TCP-балансировки и обеспечения отказоустойчивости (failover) с активным мониторингом доступности узлов.
+  - Обеспечение безопасности с помощью UFW и Fail2Ban.
 
 
 ### Стек:
-- Операционная система: Ubuntu 24.04 LTS[¹](#примечание-к-версиям)
-- База данных: MySQL Server Ver 8.0.45[¹](#примечание-к-версиям)
-- Безопасность: UFW 0.36.2[¹](#примечание-к-версиям), Fail2Ban v1.0.2[¹](#примечание-к-версиям)
+- Операционная система: Ubuntu 24.04 LTS
+- База данных: MySQL Server 8+
+- Балансировка нагрузки и отказоустойчивость: HAProxy
+- Безопасность: UFW, Fail2Ban
 - Репликация 	GTID (Global Transaction Identifiers)
 
 
 ### Требования:
 - Ubuntu 24.04 LTS[¹](#примечание-к-версиям)
-- Ansible core 2.16.3[¹](#примечание-к-версиям)
+- Ansible core 2.20.3[¹](#примечание-к-версиям)
 - Python 3.12.3[¹](#примечание-к-версиям)
-- OpenSSH_9.6p1[¹](#примечание-к-версиям): Учетная запись, от имени которой запускается Ansible, должна иметь права `sudo` на целевых хостах. Настоятельно рекомендуется использовать SSH-ключи.
+- OpenSSH_9.6p1[¹](#примечание-к-версиям): учетная запись с правами 'sudo', доступ по SSH-ключам.
 
 ### Примечание к версиям:
-¹ Указанные версии являются протестированными. Использование более ранних версий (например, Ubuntu 20.04/22.04 или Ansible < 2.16) не гарантирует успешное выполнение сценария.
+¹ Сценарий тестировался на указанных версиях. Использование более ранних или иных версий не гарантирует корректную работу и требует дополнительного тестирования.
 
 
 ### Структура репозитория:
@@ -47,10 +48,12 @@
 ├── group_vars
 │   └── all.yml.example
 ├── host_vars
+│   ├── haproxy_b.yml.example
 │   ├── master1.yml.example
 │   └── master2.yml.example
 ├── inventory
 │   └── hosts.example
+├── LICENSE
 ├── master.yml
 ├── README.md
 ├── roles
@@ -64,6 +67,13 @@
 │   │   │   └── main.yml
 │   │   └── templates
 │   │       └── jail.local.j2
+│   ├── haproxy
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   └── templates
+│   │       └── haproxy.cfg.j2
 │   ├── mysql
 │   │   ├── handlers
 │   │   │   └── main.yml
@@ -77,7 +87,7 @@
 │   └── ufw
 │       └── tasks
 │           └── main.yml
-└──  secrets.yml.example
+└── secrets.yml.example
 
 ```
 
@@ -91,7 +101,7 @@ cd mysql-master-master
 
 2. Настройка инвентаря: <br />
 
-Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). В этом файле укажите IP-адреса удаленных серверов, данные пользователей, SSH-порты. <br />
+Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). Укажите в нем IP-адреса серверов, данные пользователей и SSH-порты. <br />
 
 
 3. Проверка доступности серверов: <br />
@@ -108,15 +118,15 @@ ansible-vault create secrets.yml
 
 Введите надежный пароль для Vault. Структура ожидаемых секретов приведена в ./secrets.yml.example
 
-5. Настройка переменных окружения (host_vars / group_vars):  <br />
+5. Настройка переменных окружения:  <br />
 
-В каталогах group_vars и host_vars создайте файлы переменных ./group_vars/all.yml , ./host_vars/{master1.yml,master2.yml}
+В каталоге group_vars создайте файл all.yml, а в host_vars — файлы для каждого хоста: master1.yml, master2.yml, haproxy_b.yml. <br />
+В качестве примеров используйте файлы с расширением .example в соответствующих каталогах.
+Отредактируйте переменные под вашу среду.
 
-Также вы можете использовать примеры:  all.yml.example , master1.yml.example , master2.yml.example <br />
+<br />
 
-Измените значения переменных на актуальные для вашей среды.  <br />
-
-Задайте необходимые параметры для fail2ban:
+6. Задайте необходимые параметры для fail2ban: <br />
 ```
 - logpath_ssh:    # Путь к логу SSH.
 - maxretry_f2b:   # Максимальное количество попыток входа перед блокировкой.
@@ -127,7 +137,7 @@ ansible-vault create secrets.yml
 ```
 
 7. Запуск плейбука: <br />
-Запустите плейбук. Сценарий автоматически проверит статус репликации после запуска:
+Запустите сценарий:
 ```
 ansible-playbook master.yml --ask-vault-password
 ```
@@ -135,25 +145,25 @@ ansible-playbook master.yml --ask-vault-password
 ### Проверка репликации:
 
  <br />
-- Автоматическая проверка статуса: включена. Если Replica_IO_Running или Replica_SQL_Running не равно 'Yes' после запуска, выполнение прервется, сигнализируя о сбое репликации. <br />
 
-Запуск только проверки статуса:
+1. Автоматическая проверка:  <br />
+После каждого запуска плейбука Ansible автоматически проверяет состояние репликации. Если параметры Replica_IO_Running или Replica_SQL_Running не равны 'Yes', плейбук прервет выполнение с детальным сообщением об ошибке.
+
+Чтобы запустить только проверку статуса (без изменений):
 ```
 ansible-playbook master.yml --ask-vault-pass -v --tags "check_replication"
 ```
 
-- Ручная проверка:
+2. Ручная проверка: <br />
+Подключитесь по SSH к одному из мастеров:
 ```
 ssh user@master1
 ```
-
-Проверка статуса сервиса:
+Проверьте статус MySQL:
 ```
 systemctl status mysql
 ```
-
-Проверка статуса репликации:
-
+Проверьте статус репликации:
 ```
 mysql -S /var/run/mysqld/mysqld.sock  <<EOF
 SHOW MASTER STATUS;
