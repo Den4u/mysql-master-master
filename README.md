@@ -137,7 +137,7 @@ ansible-vault create secrets.yml
 ```
 
 7. Запуск плейбука: <br />
-Запустите сценарий:
+
 ```
 ansible-playbook master.yml --ask-vault-password
 ```
