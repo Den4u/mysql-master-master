@@ -56,6 +56,7 @@ The configuration includes:
 ├── LICENSE
 ├── master.yml
 ├── README.md
+├── README.ru.md
 ├── roles
 │   ├── dependencies
 │   │   └── tasks
