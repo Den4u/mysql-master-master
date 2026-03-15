@@ -9,7 +9,7 @@
     src: templates/jail.local.j2
     dest: /etc/fail2ban/jail.local
     mode: '0644'
-  notify: Restart fail2ban 
+  notify: Restart fail2ban
 
 - name: Check fail2ban is enabled and started
   ansible.builtin.systemd:

@@ -6,10 +6,10 @@ server-id = {{ server_id }}
 # Журнал ошибок
 log_error = {{ log_error }}
 
-# Адрес 1/2 мастера
-bind-address = {{ private_host }}
+# Адрес, на котором сервер слушает подключения.
+bind-address = {{ bind_address }}
 
-# Путь к bin-логам
+# Логи бинарных журналов
 log_bin = {{ log_bin }}
 log_bin_index = {{ log_bin_index }} 
 
@@ -33,7 +33,6 @@ expire_logs_days = {{ expire_logs_days }}
 # Максимальный размер бин-лога
 max_binlog_size = {{ max_binlog_size }}
 
-
 # GTID - уникальный 128-битный глобальный идентификационный номер (SERVER_UUID)
 gtid_mode = ON
 
@@ -48,7 +47,6 @@ relay_log_info_repository = TABLE
 
 # Автоматически восстанавливает relay logs при запуске слейва
 relay_log_recovery = ON
-
 
 # Бин логи синхронизируются с диском после каждого транзакции
 sync_binlog = 1

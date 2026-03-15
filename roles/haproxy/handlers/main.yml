@@ -1,5 +1,5 @@
----
-- name: Restart MySQL
+- name: Restart HAProxy
   ansible.builtin.systemd:
-    name: mysql
+    name: haproxy
     state: restarted
+ 

@@ -1,5 +1,4 @@
 # Секреты и переменные среды
-
 *.env
 !*.env.j2
 *.local
@@ -19,7 +18,13 @@ master2.yml
 !master1.yml.example
 !master2.yml.example
 
-haproxy
+haproxy.yml
+!haproxy.yml.example
+
+haproxy_b.yml
+
+debug
+debug.txt
 
 # --- Временные файлы Python/Ansible ---
 __pycache__/

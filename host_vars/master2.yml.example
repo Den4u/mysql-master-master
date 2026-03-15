@@ -1,9 +1,15 @@
-# --- Unique host2 variables ---
+# --- Master2 variables ---
 
-private_host: private_ip_host
-other_host_ip: other_private_ip_host
-
+private_host: private_host_ip
+other_master_ip: other_master_ip
 
 # --- mysqld.cnf ---
-server_id: 2
-auto_increment_offset: 2
+server_id: 1
+auto_increment_offset: 1
+
+# --- UFW ---
+ufw_rules:
+  - { port: '22', src: '{{ other_master_ip }}' }
+  - { port: '22', src: '{{ admin_ssh_ip }}' }
+  - { port: '3306', src: '{{ other_master_ip }}' }
+  - { port: '3306', src: '{{ haproxy_host_ip }}' }

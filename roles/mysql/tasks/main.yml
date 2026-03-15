@@ -20,7 +20,7 @@
 - name: Create database user 'replica' with replication privileges
   community.mysql.mysql_user:
     name: "{{ replica_user }}"
-    host: "{{ other_host_ip }}"
+    host: "{{ other_master_ip }}"
     password: "{{ mysql_replica_pass }}"
     priv: '*.*:REPLICATION SLAVE'
     state: present
@@ -36,44 +36,41 @@
 - name: Apply MySQL configuration changes
   ansible.builtin.meta: flush_handlers
 
-- name: Check if replica is running
-  community.mysql.mysql_replication:
-    mode: getreplica
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-  register: replica_status
-  ignore_errors: yes
-
-- name: Stop slave only if it is running
+- name: Stop replica before configuration
   community.mysql.mysql_replication:
     mode: stopreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
-  when: replica_status is defined and replica_status.Replica_IO_Running == 'Yes' and replica_status.Replica_SQL_Running == 'Yes'
-  ignore_errors: yes
+  failed_when: false
 
 - name: Configure replication slave with GTID auto position
   community.mysql.mysql_replication:
     mode: changeprimary
-    master_host: "{{ other_host_ip }}"
+    master_host: "{{ other_master_ip }}"
     master_user: "{{ replica_user }}"
     master_password: "{{ mysql_replica_pass }}"
     master_auto_position: true
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Start slave
+- name: Start replication
   community.mysql.mysql_replication:
     mode: startreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Replication status check block
+- name: Check replication status
+  community.mysql.mysql_replication:
+    mode: getreplica
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: replica_status
   tags: check_replication
-  block:
-    - name: Check replication status
-      community.mysql.mysql_replication:
-        mode: getreplica
-        login_unix_socket: /var/run/mysqld/mysqld.sock
-      register: replica_status
- 
-    - name: Fail if replication is not running
-      ansible.builtin.fail:
-        msg: "Replication is not running properly! Replica_IO_Running={{ replica_status.Replica_IO_Running }}, Replica_SQL_Running={{ replica_status.Replica_SQL_Running }}"
-      when: replica_status.Replica_IO_Running != 'Yes' or replica_status.Replica_SQL_Running != 'Yes'
+
+- name: Assert replication is healthy
+  ansible.builtin.assert:
+    that:
+      - replica_status.Replica_IO_Running == 'Yes'
+      - replica_status.Replica_SQL_Running == 'Yes'
+    success_msg: "Replication on {{ inventory_hostname }} is healthy!"
+    fail_msg: >
+                Replication error!
+                IO: {{ replica_status.Replica_IO_Running }},
+                SQL: {{ replica_status.Replica_SQL_Running }}
+  tags: check_replication

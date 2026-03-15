@@ -1,0 +1,46 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    user haproxy
+    group haproxy
+    daemon
+    maxconn 2000
+
+defaults
+    log     global
+    mode    tcp
+    option  tcplog
+    timeout connect 5s
+    timeout client  1m
+    timeout server  1m
+
+frontend mysql_front
+    bind *:3306
+    mode tcp
+    default_backend mysql_back
+
+# Backend: настройка failover
+backend mysql_back
+    mode tcp
+    option tcp-check
+
+    balance first 
+
+    # Master1: Active
+    server {{ master1_name }} {{ master1_ip }}:3306 check inter 2000 rise 2 fall 3
+    # Master2: Backup (if the first one is unavailable)
+    server {{ master2_name }} {{ master2_ip }}:3306 check inter 2000 rise 2 fall 3 backup
+
+# secret-stats-admin-panel
+listen stats
+    bind *:8080
+    mode http
+    stats enable
+    stats uri /{{ admin_panel }}
+    stats refresh 5s
+
+    acl allowed_network src "{{ allowed_network }}"
+    http-request deny if !allowed_network
+
+    stats auth {{ login_haproxy }}:{{ passwd_haproxy }}
