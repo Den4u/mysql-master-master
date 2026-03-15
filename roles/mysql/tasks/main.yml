@@ -1,5 +1,5 @@
 ---
-- name: Mysql install
+- name: Install MySQL server
   ansible.builtin.apt:
     name: mysql-server
     state: present
@@ -26,23 +26,23 @@
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Create mysqld.cnf
+- name: Deploy MySQL configuration from template
   ansible.builtin.template:
     src: templates/mysqld.cnf.j2
     dest: /etc/mysql/mysql.conf.d/mysqld.cnf
     mode: '0644'
   notify: Restart MySQL
 
-- name: Apply MySQL configuration changes
+- name: Apply pending configuration changes
   ansible.builtin.meta: flush_handlers
 
-- name: Stop replica before configuration
+- name: Stop replication before reconfiguration
   community.mysql.mysql_replication:
     mode: stopreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
   failed_when: false
 
-- name: Configure replication slave with GTID auto position
+- name: Configure replication slave with GTID auto-positioning
   community.mysql.mysql_replication:
     mode: changeprimary
     master_host: "{{ other_master_ip }}"
@@ -51,19 +51,19 @@
     master_auto_position: true
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Start replication
+- name: Start replication process
   community.mysql.mysql_replication:
     mode: startreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Check replication status
+- name: Retrieve replication status
   community.mysql.mysql_replication:
     mode: getreplica
     login_unix_socket: /var/run/mysqld/mysqld.sock
   register: replica_status
   tags: check_replication
 
-- name: Assert replication is healthy
+- name: Verify replication health
   ansible.builtin.assert:
     that:
       - replica_status.Replica_IO_Running == 'Yes'

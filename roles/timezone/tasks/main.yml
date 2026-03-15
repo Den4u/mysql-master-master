@@ -1,4 +1,4 @@
 ---
-- name: Set timezone to Europe/Moscow
+- name: Set system timezone
   community.general.timezone:
     name: "{{ timezone_ }}"

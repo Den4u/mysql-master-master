@@ -10,7 +10,7 @@
         update_cache: yes
         cache_valid_time: 3600
 
-- name: configure MySQL Master-Master
+- name: Configure MySQL Master-Master
   hosts: mysql
   become: True
   vars_files:

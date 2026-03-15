@@ -1,14 +1,15 @@
 # --- HAProxy variables ---
 
-# server's name
+# Server hostname
 master1_name: mysql-master-1
 master2_name: mysql-master-2
 
-# server's ip
+# Server IP address
 master1_ip: master1_ip
 master2_ip: master2_ip
 
-
+# --- UFW ---
+# Firewall rules
 ufw_rules:
   - { port: '22', src: '{{ admin_ssh_ip }}' }
   - { port: '8080', src: '{{ admin_ssh_ip }}' } 

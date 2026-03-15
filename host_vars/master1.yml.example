@@ -4,10 +4,13 @@ private_host: private_host_ip
 other_master_ip: other_master_ip
 
 # --- mysqld.cnf ---
+# Unique server identifier
 server_id: 1
+# Offset for auto-increment columns
 auto_increment_offset: 1
 
 # --- UFW ---
+# Firewall rules
 ufw_rules:
   - { port: '22', src: '{{ other_master_ip }}' }
   - { port: '22', src: '{{ admin_ssh_ip }}' }

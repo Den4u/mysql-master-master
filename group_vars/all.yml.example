@@ -1,21 +1,22 @@
 # --- mysqld.cnf ---
+# MySQL bind address
 bind_address: 0.0.0.0
 
-# Error log
+# Error log path
 log_error: /var/log/mysql/error.log
 
-# Путь к bin-логам
+# Path to binary logs
 log_bin: /var/log/mysql/mysql-bin.log
 log_bin_index: /var/log/mysql/mysql-bin.index
 
-# Relay лог для слейва
+# Relay log for replica
 relay_log: /var/log/mysql/mysql-relay-bin
 relay_log_index: /var/log/mysql/mysql-relay-bin.index
 
-# Время хранения бин-логов
+# Retention period for binary logs
 expire_logs_days: 7
 
-# Максимальный размер бин-лога
+# Maximum size of a binary log file
 max_binlog_size: 500M
 
 
@@ -29,7 +30,7 @@ ignoreip_f2b: ip1 ip2 ... ipN
 port_ssh_f2b: 22                      
 
 # --- Timezone ---
-timezone_: "Europe/Moscow"
+timezone_: "/"
 
 # --- UFW ---
 admin_ssh_ip: admin_ssh_ip
@@ -37,12 +38,11 @@ admin_ssh_ip: admin_ssh_ip
 # --- HAProxy ---
 haproxy_host_ip: haproxy_host_ip
 
-# URI HAProxy stats
+# URI for HAProxy stats
 admin_panel: "admin-panel"
-
 
 # haproxy.cfg.j2
 allowed_network: allowed_network_ip
 
-# User replication
+# MySQL replication user
 replica_user: replica
