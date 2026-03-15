@@ -3,44 +3,44 @@
 ![Ansible](https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=white)
 ![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
 
-### Содержание:
-* [Описание](#описание)
-* [Стек](#стек)
-* [Требования](#требования)
-* [Структура репозитория](#структура-репозитория)
-* [Как запустить сценарий](#как-запустить-сценарий)
-* [Проверка](#проверка) 
+### Contents:
+* [Description](#description)
+* [Tech Stack](#tech-stack)
+* [Requirements](#requirements)
+* [Repository Structure](#repository-structure)
+* [How to Run the Playbook](#how-to-run-the-playbook)
+* [Verification](#verification) 
 
 
-### Описание:
-Репозиторий содержит сценарий Ansible для развертывания HAProxy + MySQL (Master-Master). 
+### Description:
+This repository contains an Ansible playbook for deploying HAProxy + MySQL (Master-Master). 
 
-Настройка включает:
-  - Базовую подготовку системы (часовой пояс, необходимые зависимости).
-  - Установку и конфигурацию MySQL с Master-Master репликацией через GTID.
-  - Настройку HAProxy для TCP-балансировки и обеспечения отказоустойчивости (failover) с активным мониторингом доступности узлов.
-  - Обеспечение безопасности с помощью UFW и Fail2Ban.
-
-
-### Стек:
-- Операционная система: Ubuntu 24.04 LTS
-- База данных: MySQL Server 8+
-- Балансировка нагрузки и отказоустойчивость: HAProxy
-- Безопасность: UFW, Fail2Ban
-- Репликация 	GTID (Global Transaction Identifiers)
+The configuration includes:
+  - Basic system preparation (timezone, required dependencies).
+  - MySQL installation and configuration with Master-Master replication using GTID.
+  - HAProxy setup for TCP load balancing and failover with active node health monitoring.
+  - Security hardening using UFW and Fail2Ban.
 
 
-### Требования:
-- Ubuntu 24.04 LTS[¹](#примечание-к-версиям)
-- Ansible core 2.20.3[¹](#примечание-к-версиям)
-- Python 3.12.3[¹](#примечание-к-версиям)
-- OpenSSH_9.6p1[¹](#примечание-к-версиям): учетная запись с правами 'sudo', доступ по SSH-ключам.
-
-### Примечание к версиям:
-¹ Сценарий тестировался на указанных версиях. Использование более ранних или иных версий не гарантирует корректную работу и требует дополнительного тестирования.
+### Tech Stack:
+- Operating System: Ubuntu 24.04 LTS
+- Database: MySQL Server 8+
+- Load Balancing and Failover: HAProxy
+- Security: UFW, Fail2Ban
+- Replication: GTID (Global Transaction Identifiers)
 
 
-### Структура репозитория:
+### Requirements:
+- Ubuntu 24.04 LTS[¹](#version-notes)
+- Ansible core 2.20.3[¹](#version-notes)
+- Python 3.12.3[¹](#version-notes)
+- OpenSSH_9.6p1[¹](#version-notes): User account with 'sudo' privileges, SSH key-based access.
+
+### Version Notes:
+¹ The playbook has been tested with the specified versions. Using earlier or different versions may not guarantee proper functionality and requires additional testing.
+
+
+### Repository Structure:
 
 ```
 .
@@ -91,79 +91,79 @@
 
 ```
 
-### Как запустить сценарий:
+### How to Run the Playbook:
 
-1. Клонирование репозитория:
+1. Clone the repository:
 ```
 git clone git@github.com:Den4u/mysql-master-master.git
 cd mysql-master-master
 ```
 
-2. Настройка инвентаря: <br />
+2. Configure the inventory: <br />
 
-Создайте файл инвентаря ./inventory/hosts (или используйте hosts.example). Укажите в нем IP-адреса серверов, данные пользователей и SSH-порты. <br />
+Create the inventory file ./inventory/hosts (or use hosts.example). Specify server IP addresses, user credentials, and SSH ports. <br />
 
 
-3. Проверка доступности серверов: <br />
+3. Verify server connectivity: <br />
 ```
 ansible all -m ping
 ```
 
-4. Создание зашифрованного хранилища секретов: <br />
+4. Create an encrypted secrets vault: <br />
 
-Создайте файл secrets.yml в корне репозитория с использованием Ansible Vault.
+Create a secrets.yml file in the repository root using Ansible Vault.
 ```
 ansible-vault create secrets.yml
 ```
 
-Введите надежный пароль для Vault. Структура ожидаемых секретов приведена в ./secrets.yml.example
+Enter a strong Vault password. The expected secrets structure is provided in ./secrets.yml.example
 
-5. Настройка переменных окружения:  <br />
+5. Configure environment variables:  <br />
 
-В каталоге group_vars создайте файл all.yml, а в host_vars — файлы для каждого хоста: master1.yml, master2.yml, haproxy_b.yml. <br />
-В качестве примеров используйте файлы с расширением .example в соответствующих каталогах.
-Отредактируйте переменные под вашу среду.
+In the group_vars directory, create an all.yml file, and in host_vars, create files for each host: master1.yml, master2.yml, haproxy_b.yml. <br />
+Use the .example files in the respective directories as templates.
+Edit the variables according to your environment.
 
 <br />
 
-6. Задайте необходимые параметры для fail2ban: <br />
+6. Set required fail2ban parameters: <br />
 ```
-- logpath_ssh:    # Путь к логу SSH.
-- maxretry_f2b:   # Максимальное количество попыток входа перед блокировкой.
-- findtime_f2b:   # Период времени, в течение которого засчитываются неудачные попытки.
-- bantime_f2b:    # Продолжительность блокировки (например, 1d, 1h, 10m).
-- ignoreip_f2b:   # IP-адреса, которые не будут блокироваться (укажите через пробел).
-- port_ssh_f2b:   # Порт SSH.
+- logpath_ssh:    # Path to the SSH log file.
+- maxretry_f2b:   # Maximum number of failed login attempts before blocking.
+- findtime_f2b:   # Time period during which failed attempts are counted.
+- bantime_f2b:    # Block duration (e.g., 1d, 1h, 10m).
+- ignoreip_f2b:   # IP addresses that will not be blocked (space-separated).
+- port_ssh_f2b:   # SSH port.
 ```
 
-7. Запуск плейбука: <br />
+7. Run the playbook: <br />
 
 ```
 ansible-playbook master.yml --ask-vault-password
 ```
 
-### Проверка:
+### Verification:
 
  <br />
 
-1. Автоматическая проверка репликации:  <br />
-После каждого запуска плейбука Ansible автоматически проверяет состояние репликации. Если параметры Replica_IO_Running или Replica_SQL_Running не равны 'Yes', плейбук прервет выполнение с детальным сообщением об ошибке.
+1. Automatic replication check:  <br />
+After each playbook run, Ansible automatically verifies the replication status. If Replica_IO_Running or Replica_SQL_Running are not 'Yes', the playbook will abort with a detailed error message.
 
-Чтобы запустить только проверку статуса (без изменений):
+To run only the status check (without changes):
 ```
 ansible-playbook master.yml --ask-vault-pass -v --tags "check_replication"
 ```
 
-2. Ручная проверка репликации: <br />
-Подключитесь по SSH к одному из мастеров:
+2. Manual replication check: <br />
+SSH into one of the masters:
 ```
 ssh user@master1
 ```
-Проверьте статус MySQL:
+Check MySQL status:
 ```
 systemctl status mysql
 ```
-Проверьте статус репликации:
+Check replication status:
 ```
 mysql -S /var/run/mysqld/mysqld.sock  <<EOF
 SHOW MASTER STATUS;
@@ -172,12 +172,12 @@ SELECT @@GLOBAL.gtid_executed;
 EOF
 ```
 
-3. Мониторинг HAProxy:  <br />
-Панель HAProxy для отслеживания состояния бэкендов доступна по HTTP:
+3. HAProxy monitoring:  <br />
+The HAProxy dashboard for backend status monitoring is available via HTTP:
 ```
 http://<IP_HAPROXY>:8080/{{ admin_panel }}
 ```
-Безопасность: Доступ разрешён только с IP-адресов, указанных в переменной allowed_network. <br />
-Авторизация: Используются логин и пароль, заданные в secrets.yml
+Security: Access is restricted to IP addresses specified in the allowed_network variable. <br />
+Authentication: Uses the login and password defined in secrets.yml
 
-### Реализация: [Den4u](https://github.com/Den4u)
+### Implementation by: [Den4u](https://github.com/Den4u)
