@@ -1,15 +1,20 @@
 ---
+- name: Prepare all nodes
+  hosts: all
+  become: True
+  vars_files:
+    - secrets.yml  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
 - name: configure MySQL Master-Master
   hosts: mysql
   become: True
   vars_files:
     - secrets.yml
-
-  pre_tasks:
-    - name: update the apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
 
   roles:
     - dependencies
@@ -18,17 +23,11 @@
     - ufw
     - fail2ban
 
-- name: configure HAProxy
+- name: Сonfigure HAProxy
   hosts: haproxy
   become: True
   vars_files:
     - secrets.yml
-
-  pre_tasks:
-    - name: update the apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
 
   roles:
     - timezone  
