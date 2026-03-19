@@ -46,3 +46,6 @@ allowed_network: allowed_network_ip
 
 # MySQL replication user
 replica_user: replica
+
+# --- Zabbix ---
+zabbix_host_ip: 192.168.122.11

@@ -18,3 +18,9 @@
     state: enabled
     policy: deny
     direction: incoming
+
+- name: Ensure UFW service is enabled and started
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+    enabled: true
