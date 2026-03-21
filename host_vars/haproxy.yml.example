@@ -1,0 +1,30 @@
+# --- HAProxy variables ---
+
+# - haproxy.cfg.j2 -
+# Hostnames for master nodes (used for identification)
+master1_name: mysql-master-1
+master2_name: mysql-master-2
+
+# Private IP addresses of master nodes
+master1_ip: master1_ip
+master2_ip: master2_ip
+
+# HAProxy statistics panel configuration
+# Admin panel URI
+admin_panel: "admin-panel"
+
+# Bind to localhost only - stats panel accessible only via localhost/SSH tunnel
+haproxy_stats_panel_bind: 127.0.0.1
+
+# Statistics panel port
+haproxy_stats_panel_port: 8081
+
+# HAProxy statistics panel refresh interval
+web_stats_resfresh: 5s
+
+# --- UFW ---
+# Firewall rules
+ufw_rules:
+  - { port: '22', src: '{{ admin_ssh_ip }}' }
+  - { port: '10050', src: '{{ zabbix_host_ip }}' } 
+  

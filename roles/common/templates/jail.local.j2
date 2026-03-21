@@ -1,0 +1,28 @@
+[DEFAULT]
+# Maximum number of failed login attempts before blocking.
+maxretry  = {{ maxretry_f2b }}
+
+# A host is banned if it has generated "maxretry" during the last "findtime" s/m
+findtime  = {{ findtime_f2b }}
+
+# Block duration (e.g., 1d, 1h, 10m).
+bantime   = {{ bantime_f2b }}
+
+# Can be a list of IP addresses, CIDR masks or DNS hosts.
+ignoreip = {{ ignoreip_f2b }}
+
+# Ban action: use UFW to block
+banaction = ufw
+
+
+[sshd]
+enabled = true
+
+# SSH port.
+port = {{ port_ssh_f2b }}
+
+# Path to the SSH log file.
+logpath = {{ logpath_ssh }}
+
+
+

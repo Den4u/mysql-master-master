@@ -52,9 +52,10 @@ The configuration includes:
 ├── group_vars
 │   └── all.yml.example
 ├── host_vars
-│   ├── haproxy_b.yml.example
+│   ├── haproxy.yml.example
 │   ├── master1.yml.example
-│   └── master2.yml.example
+│   ├── master2.yml.example
+│   └── zabbix_host.yml.example
 ├── inventory
 │   └── hosts.example
 ├── LICENSE
@@ -62,16 +63,19 @@ The configuration includes:
 ├── README.md
 ├── README.ru.md
 ├── roles
-│   ├── dependencies
-│   │   └── tasks
-│   │       └── main.yml
-│   ├── fail2ban
+│   ├── common
 │   │   ├── handlers
 │   │   │   └── main.yml
 │   │   ├── tasks
-│   │   │   └── main.yml
+│   │   │   ├── fail2ban.yml
+│   │   │   ├── main.yml
+│   │   │   ├── timezone.yml
+│   │   │   └── ufw.yml
 │   │   └── templates
 │   │       └── jail.local.j2
+│   ├── docker
+│   │   └── tasks
+│   │       └── main.yml
 │   ├── haproxy
 │   │   ├── handlers
 │   │   │   └── main.yml
@@ -86,12 +90,20 @@ The configuration includes:
 │   │   │   └── main.yml
 │   │   └── templates
 │   │       └── mysqld.cnf.j2
-│   ├── timezone
-│   │   └── tasks
-│   │       └── main.yml
-│   └── ufw
-│       └── tasks
-│           └── main.yml
+│   ├── zabbix-agent
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   └── templates
+│   │       └── zabbix_agent2.conf.j2
+│   └── zabbix-server
+│       ├── handlers
+│       │   └── main.yml
+│       ├── tasks
+│       │   └── main.yml
+│       └── templates
+│           └── docker-compose.yml.j2
 └── secrets.yml.example
 
 ```
@@ -131,17 +143,7 @@ Edit the variables according to your environment.
 
 <br />
 
-6. Set required fail2ban parameters: <br />
-```
-- logpath_ssh:    # Path to the SSH log file.
-- maxretry_f2b:   # Maximum number of failed login attempts before blocking.
-- findtime_f2b:   # Time period during which failed attempts are counted.
-- bantime_f2b:    # Block duration (e.g., 1d, 1h, 10m).
-- ignoreip_f2b:   # IP addresses that will not be blocked (space-separated).
-- port_ssh_f2b:   # SSH port.
-```
-
-7. Run the playbook: <br />
+6. Run the playbook: <br />
 
 ```
 ansible-playbook master.yml --ask-vault-password

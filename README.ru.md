@@ -2,7 +2,7 @@
 
 <div align="right">
   
-**Language:** [English](README.md) | [Русский](README.ru.md) 
+**Язык:** [English](README.md) | [Русский](README.ru.md) 
 
 </div> 
 
@@ -52,9 +52,10 @@
 ├── group_vars
 │   └── all.yml.example
 ├── host_vars
-│   ├── haproxy_b.yml.example
+│   ├── haproxy.yml.example
 │   ├── master1.yml.example
-│   └── master2.yml.example
+│   ├── master2.yml.example
+│   └── zabbix_host.yml.example
 ├── inventory
 │   └── hosts.example
 ├── LICENSE
@@ -62,16 +63,19 @@
 ├── README.md
 ├── README.ru.md
 ├── roles
-│   ├── dependencies
-│   │   └── tasks
-│   │       └── main.yml
-│   ├── fail2ban
+│   ├── common
 │   │   ├── handlers
 │   │   │   └── main.yml
 │   │   ├── tasks
-│   │   │   └── main.yml
+│   │   │   ├── fail2ban.yml
+│   │   │   ├── main.yml
+│   │   │   ├── timezone.yml
+│   │   │   └── ufw.yml
 │   │   └── templates
 │   │       └── jail.local.j2
+│   ├── docker
+│   │   └── tasks
+│   │       └── main.yml
 │   ├── haproxy
 │   │   ├── handlers
 │   │   │   └── main.yml
@@ -86,12 +90,20 @@
 │   │   │   └── main.yml
 │   │   └── templates
 │   │       └── mysqld.cnf.j2
-│   ├── timezone
-│   │   └── tasks
-│   │       └── main.yml
-│   └── ufw
-│       └── tasks
-│           └── main.yml
+│   ├── zabbix-agent
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   └── templates
+│   │       └── zabbix_agent2.conf.j2
+│   └── zabbix-server
+│       ├── handlers
+│       │   └── main.yml
+│       ├── tasks
+│       │   └── main.yml
+│       └── templates
+│           └── docker-compose.yml.j2
 └── secrets.yml.example
 
 ```
@@ -131,17 +143,7 @@ ansible-vault create secrets.yml
 
 <br />
 
-6. Задайте необходимые параметры для fail2ban: <br />
-```
-- logpath_ssh:    # Путь к логу SSH.
-- maxretry_f2b:   # Максимальное количество попыток входа перед блокировкой.
-- findtime_f2b:   # Период времени, в течение которого засчитываются неудачные попытки.
-- bantime_f2b:    # Продолжительность блокировки (например, 1d, 1h, 10m).
-- ignoreip_f2b:   # IP-адреса, которые не будут блокироваться (укажите через пробел).
-- port_ssh_f2b:   # Порт SSH.
-```
-
-7. Запуск плейбука: <br />
+6. Запуск плейбука: <br />
 
 ```
 ansible-playbook master.yml --ask-vault-password

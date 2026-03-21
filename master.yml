@@ -1,6 +1,6 @@
 ---
 - name: Prepare all nodes
-  hosts: all
+  hosts: all_nodes
   become: True
   vars_files:
     - secrets.yml  
@@ -9,28 +9,56 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
+  tags:
+    - apt_cache
+
+- name: Configure all nodes (timezone, ufw, fail2ban)
+  hosts: all_nodes
+  become: True
+  vars_files:
+    - secrets.yml
+  roles:
+    - common
+  tags:
+    - common
 
 - name: Configure MySQL Master-Master
-  hosts: mysql
+  hosts: mysql_nodes
   become: True
   vars_files:
     - secrets.yml
-
   roles:
-    - dependencies
-    - timezone
     - mysql
-    - ufw
-    - fail2ban
+  tags:
+    - mysql
 
 - name: Сonfigure HAProxy
-  hosts: haproxy
+  hosts: haproxy_node
   become: True
   vars_files:
     - secrets.yml
-
   roles:
-    - timezone  
     - haproxy
-    - ufw
-    - fail2ban
+  tags:
+    - haproxy
+
+- name: Install Zabbix server (Docker)
+  hosts: zabbix_node
+  become: True
+  vars_files:
+    - secrets.yml
+  roles:
+    - docker
+    - zabbix-server
+  tags:
+    - zabbix-server
+
+- name: Install Zabbix-agent2
+  hosts: all_nodes
+  become: True
+  vars_files:
+    - secrets.yml
+  roles:
+    - zabbix-agent
+  tags:
+    - zabbix-agent

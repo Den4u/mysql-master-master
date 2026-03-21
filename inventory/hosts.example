@@ -1,13 +1,23 @@
 [all:vars]
+# All variables
 ansible_user=ansible
-ansible_ssh_private_key_file=~/.ssh/rsa
+ansible_ssh_private_key_file=~/.ssh/path_to_key
 
-[mysql]
-# MySQL Master 1: host
-master1 ansible_host=<master_ip1>
-# MySQL Master 2: host
-master2 ansible_host=<master_ip2>
+[mysql_nodes]
+# MySQL Master 1
+master1 ansible_host=<master1_ip>
+# MySQL Master 2
+master2 ansible_host=<master2_ip>
 
-[haproxy]
-# HAProxy Load Balancer: host, user, port, and SSH key
-haproxy_b ansible_host=<haproxy_ip>
+[haproxy_node]
+# HAProxy Load Balancer
+haproxy ansible_host=<haproxy_ip>
+
+[zabbix_node]
+# Zabbix server
+zabbix_host ansible_host=<zabbix_ip>
+
+[all_nodes:children]
+mysql_nodes
+haproxy_node
+zabbix_node

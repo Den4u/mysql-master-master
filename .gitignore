@@ -12,16 +12,16 @@ secrets.yml
 hosts
 inventory/hosts
 
-all.yml
-!all.yml.example
+all_nodes.yml
+mysql_nodes.yml
 
 master1.yml
 master2.yml
-!master1.yml.example
-!master2.yml.example
+
+zabbix_host.yml
 
 haproxy.yml
-!haproxy.yml.example
+
 
 haproxy_b.yml
 

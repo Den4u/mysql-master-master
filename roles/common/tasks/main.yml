@@ -1,0 +1,12 @@
+---
+- name: Apply timezone configuration
+  ansible.builtin.import_tasks: 
+    file: timezone.yml
+
+- name: Apply UFW configuration
+  ansible.builtin.import_tasks: 
+    file: ufw.yml
+
+- name: Apply Fail2Ban configuration
+  ansible.builtin.import_tasks: 
+    file: fail2ban.yml

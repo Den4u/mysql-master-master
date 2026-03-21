@@ -1,0 +1,8 @@
+---
+- name: Apply monitoring stack configuration changes
+  community.docker.docker_compose_v2:
+    project_src: /opt/monitoring
+    pull: always
+    recreate: auto
+    remove_orphans: true
+    state: present

@@ -1,12 +1,12 @@
 # --- Master2 variables ---
 
-private_host: private_host_ip
+# Private IP of the other master node (for replication)
 other_master_ip: other_master_ip
 
 # --- mysqld.cnf ---
 # Unique server identifier
 server_id: 1
-# Offset for auto-increment columns
+# Auto-increment offset for conflict prevention
 auto_increment_offset: 1
 
 # --- UFW ---

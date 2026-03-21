@@ -1,4 +1,9 @@
 ---
+- name: Install required dependencies for module execution
+  ansible.builtin.apt:
+    name: python3-pymysql
+    state: present
+
 - name: Install MySQL server
   ansible.builtin.apt:
     name: mysql-server

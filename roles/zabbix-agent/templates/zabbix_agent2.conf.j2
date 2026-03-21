@@ -1,0 +1,34 @@
+# This is a configuration file for Zabbix agent 2 (Unix)
+
+############ GENERAL PARAMETERS #################
+PidFile=/run/zabbix/zabbix_agent2.pid
+LogFile=/var/log/zabbix/zabbix_agent2.log
+
+### Option: LogFileSize
+LogFileSize=0
+
+### Option: Server
+Server={{ server_ }}
+
+### Option: ServerActive
+ServerActive={{ server_active }}
+
+### Option: Hostname
+Hostname={{ inventory_hostname }}
+
+### Option:PluginSocket
+PluginSocket=/run/zabbix/agent.plugin.sock
+
+####### USER-DEFINED MONITORED PARAMETERS #######
+
+### Options ControlSocket
+ControlSocket=/run/zabbix/agent.sock
+
+####### PLUGIN-SPECIFIC PARAMETERS #######
+
+# Include configuration files for plugins
+Include=/etc/zabbix/zabbix_agent2.d/plugins.d/*.conf
+
+####### Additional configuration files  #######
+
+Include=/etc/zabbix/zabbix_agent2.d/*.conf

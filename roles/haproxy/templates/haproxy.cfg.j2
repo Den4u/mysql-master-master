@@ -1,3 +1,5 @@
+# HAProxy configuration for MySQL Master-Master cluster
+
 global
     log /dev/log local0
     log /dev/log local1 notice
@@ -20,27 +22,25 @@ frontend mysql_front
     mode tcp
     default_backend mysql_back
 
-# Backend: failover configuration
+# Backend: Active-Passive failover configuration
+# Primary master handles all traffic; standby master takes over on failure
 backend mysql_back
     mode tcp
     option tcp-check
 
     balance first 
 
-    # Master1: Active
+    # Active master
     server {{ master1_name }} {{ master1_ip }}:3306 check inter 2000 rise 2 fall 3
-    # Master2: Backup (if the first one is unavailable)
+    # Standby master (activates only when active fails)
     server {{ master2_name }} {{ master2_ip }}:3306 check inter 2000 rise 2 fall 3 backup
 
-# Secret statistics admin panel
+# HAProxy statistics panel
 listen stats
-    bind *:8080
+    bind {{ haproxy_stats_panel_bind }}:{{ haproxy_stats_panel_port }}
     mode http
     stats enable
     stats uri /{{ admin_panel }}
-    stats refresh 5s
-
-    acl allowed_network src "{{ allowed_network }}"
-    http-request deny if !allowed_network
+    stats refresh {{ web_stats_resfresh }}
 
     stats auth {{ login_haproxy }}:{{ passwd_haproxy }}

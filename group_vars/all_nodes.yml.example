@@ -1,0 +1,52 @@
+# --- Fail2ban ---
+# fail2ban/templates/jail.local.j2:
+
+# Path to the SSH log file.
+logpath_ssh: "%(sshd_log)s"
+
+# Maximum number of failed login attempts before blocking.
+maxretry_f2b: 5
+
+# Time period during which failed attempts are counted.
+findtime_f2b: 5m
+
+# Block duration (e.g., 1d, 1h, 10m).
+bantime_f2b: 1d
+
+# IP addresses that will not be blocked (space-separated).
+ignoreip_f2b: ip1 ip2 ip3
+
+# SSH port.
+port_ssh_f2b: 22                      
+
+# --- Timezone ---
+# System timezone for all servers
+timezone_: "Europe/Riga"
+
+# --- UFW ---
+# Admin workstation IP address (SSH access)
+admin_ssh_ip: admin_ssh_ip
+
+# --- Zabbix ---
+# Private IP address of Zabbix server node
+zabbix_host_ip: zabbix_host_private_ip
+
+# --- Zabbix-agent version ---
+# Zabbix agent version to install
+zabbix_version: 7.4
+
+# Official Zabbix repository package
+zabbix_release_package: "zabbix-release_latest_7.4+ubuntu24.04_all.deb"
+
+# Full URL to Zabbix repository package
+zabbix_repo_url: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/release/ubuntu/pool/main/z/zabbix-release/{{ zabbix_release_package }}"
+
+
+# --- Zabbix-agent2.conf.j2 ---
+# Agent hostname (must match hostname configured in Zabbix frontend)
+hostname_: "{{ inventory_hostname }}"
+
+# Zabbix server IP address for passive checks
+server_: server_ip
+# Zabbix server IP address for active checks
+server_active: server_active_ip

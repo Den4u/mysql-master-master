@@ -1,0 +1,46 @@
+---
+- name: Check if zabbix-release package is already installed
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Download Zabbix repository configuration
+  ansible.builtin.get_url:
+    url: "{{ zabbix_repo_url }}"
+    dest: "/tmp/{{ zabbix_release_package }}"
+  when: "'zabbix-release' not in ansible_facts.packages"
+
+- name: Install Zabbix repository
+  ansible.builtin.apt:
+    deb: "/tmp/{{ zabbix_release_package }}"
+    state: present
+  when: "'zabbix-release' not in ansible_facts.packages"
+  register: repo_install
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: repo_install.changed
+
+- name: Install Zabbix Agent2
+  ansible.builtin.apt:
+    name: zabbix-agent2
+    state: present
+
+- name: Remove Zabbix repository package
+  ansible.builtin.file:
+    path: "/tmp/{{ zabbix_release_package }}"
+    state: absent
+  when: repo_install.changed
+
+- name: Deploy zabbix-agent2.conf from template
+  ansible.builtin.template:
+    src: templates/zabbix_agent2.conf.j2
+    dest: /etc/zabbix/zabbix_agent2.conf
+    mode: '0644'
+  notify: Restart Zabbix-Agent2
+
+- name: Ensure Zabbix-agent2 service is enabled and started
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    state: started
+    enabled: true

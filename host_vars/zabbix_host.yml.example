@@ -1,0 +1,52 @@
+# --- Docker-compose.yml.j2 ---
+
+# - Container Image Versions -
+image_version:
+  postgres: 13
+  zabbix_server: latest
+  zabbix_web: latest
+  zabbix: latest
+
+# - Container Names -
+# Human-readable container names for easier management
+container_name:
+  zabbix_postgres: zabbix-postgres
+  zabbix_server: zabbix-server
+  zabbix_web: zabbix-web
+  zabbix: zabbix-agent
+
+# - Zabbix-server -
+# Host interface binding for Zabbix server (port 10051)
+zabbix_server_host_bind: zabbix_server_host_bind
+zabbix_server_host_port: 10051
+
+# - Zabbix-web -
+# Host interface binding for Zabbix web UI
+zabbix_web_host_bind: private_zabbix_ip
+zabbix_web_host_port: 8080
+
+# - Timezone -
+# Timezone for Zabbix web interface
+tz: Europe/Moscow
+
+# - Docker networks -
+# Isolated network for Zabbix containers
+subnet_: "subnet_zabbix_net"                              # Docker network subnet
+gateway_: gateway_zabbix_net                              # Network gateway
+zabbix_server_container_ip: zabbix_server_container_ip    # Static IP for Zabbix server container
+
+
+# --- Zabbix-agent2.conf.j2 ---
+# Zabbix server IP address for passive checks
+server_: "{{ zabbix_server_container_ip }}"
+# Zabbix server IP address for active checks
+server_active: "{{ zabbix_server_container_ip }}"
+
+
+# --- UFW ---
+# Firewall rules
+ufw_rules:
+  - { port: '22', src: '{{ admin_ssh_ip }}' }
+  - { port: '8080', src: '{{ admin_ssh_ip }}' }
+  - { port: '10050', src: '{{ zabbix_host_ip }}' } 
+  
