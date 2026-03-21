@@ -39,6 +39,13 @@
     mode: '0644'
   notify: Restart Zabbix-Agent2
 
+- name: Deploy MySQL plugin configuration (for MySQL nodes only)
+  ansible.builtin.template:
+    src: templates/mysql.conf.j2
+    dest: /etc/zabbix/zabbix_agent2.d/plugins.d/mysql.conf
+  when: inventory_hostname in groups['mysql_nodes']
+  notify: Restart Zabbix-Agent2
+
 - name: Ensure Zabbix-agent2 service is enabled and started
   ansible.builtin.systemd:
     name: zabbix-agent2

@@ -31,6 +31,15 @@
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
 
+- name: Create zabbix monitor user
+  community.mysql.mysql_user:
+    name: "{{ zbx_monitor_user }}"
+    host: "{{ zbx_localhost }}"
+    password: "{{ zbx_monitor_user_pass }}"
+    priv: '*.*:REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW'
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
 - name: Deploy MySQL configuration from template
   ansible.builtin.template:
     src: templates/mysqld.cnf.j2

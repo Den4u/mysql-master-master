@@ -22,8 +22,17 @@ expire_logs_days: 7
 max_binlog_size: 500M
 
 
-# - MySQL replication user -
+# --- Database user for replication ---
 replica_user: replica
+
+
+# --- User for Zabbix MySQL monitoring plugin ---
+zbx_monitor_user: zbx_monitor_username
+
+# MySQL host address
+zbx_localhost: localhost
+# MySQL service port
+zbx_mysql_port: 3306
 
 
 # --- HAProxy ---

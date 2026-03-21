@@ -48,10 +48,10 @@
   vars_files:
     - secrets.yml
   roles:
-    - docker
-    - zabbix-server
+    - { role: docker, tags: docker }
+    - { role: zabbix-server, tags: zabbix-server }
   tags:
-    - zabbix-server
+    - docker-zabbix
 
 - name: Install Zabbix-agent2
   hosts: all_nodes
